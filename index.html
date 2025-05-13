@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramit Dour - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* Custom scrollbar (optional, for aesthetics) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9; /* sky-500 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7; /* sky-600 */
+        }
+
+        /* Ensure full height for Three.js canvas container if needed */
+        .three-canvas-container {
+            width: 100%;
+            height: 256px; /* md:h-96 -> 384px */
+        }
+        @media (min-width: 768px) {
+            .three-canvas-container {
+                height: 384px;
+            }
+        }
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Navbar transition */
+        #navbar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .navbar-hidden {
+            transform: translateY(-100%);
+        }
+        .navbar-visible {
+            transform: translateY(0);
+        }
+
+        /* For animated hero background SVG */
+        .hero-bg-pattern path {
+            fill: currentColor;
+        }
+        .hero-bg-circle-1 {
+            fill: rgba(2, 132, 199, 0.05); /* sky-600 with opacity */
+        }
+        .hero-bg-circle-2 {
+             fill: rgba(14, 165, 233, 0.05); /* sky-500 with opacity */
+        }
+
+        /* Experience timeline line */
+        .timeline-line {
+            position: absolute;
+            left: 1rem; /* For mobile */
+            top: 0;
+            bottom: 0;
+            width: 4px; /* Increased width for visibility */
+            background-color: #bae6fd; /* sky-200 */
+            transform: translateX(-50%);
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .timeline-line {
+                left: 50%;
+            }
+        }
+        .timeline-icon-container {
+            position: absolute;
+            left: 1rem; /* For mobile */
+            top: 0.25rem; /* Adjust as needed */
+            transform: translateX(-50%);
+            background-color: #0ea5e9; /* sky-500 */
+            color: white;
+            border-radius: 9999px; /* rounded-full */
+            width: 2rem; /* w-8 */
+            height: 2rem; /* h-8 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .timeline-icon-container {
+                left: 50%;
+                width: 2.5rem; /* w-10 */
+                height: 2.5rem; /* h-10 */
+            }
+        }
+        .experience-item-container {
+            position: relative;
+            padding-left: 2.5rem; /* Space for icon and line on mobile */
+        }
+         @media (min-width: 768px) { /* md breakpoint */
+            .experience-item-container {
+                padding-left: 0; /* Reset padding for desktop */
+            }
+            .experience-item-content-wrapper.md\:flex-row-reverse .md\:pr-8 {
+                padding-right: 2rem;
+            }
+             .experience-item-content-wrapper:not(.md\:flex-row-reverse) .md\:pl-8 {
+                padding-left: 2rem;
+            }
+        }
+        .font-inter { font-family: 'Inter', sans-serif; } /* Assuming Inter is a desired font, load it if needed */
+
+    </style>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-inter antialiased text-slate-800 bg-slate-50 selection:bg-sky-300 selection:text-sky-900">
+
+    <nav id="navbar" class="bg-white/90 backdrop-blur-lg shadow-lg sticky top-0 z-50 navbar-visible">
+      <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="#home" id="navLogo" class="text-3xl font-bold text-sky-600 hover:text-sky-700 transition-colors">
+          {Name}
+        </a>
+        
+        <div class="hidden md:flex space-x-2" id="desktopNavLinks">
+          </div>
+
+        <div class="md:hidden">
+          <button id="mobileMenuButton" class="text-slate-700 focus:outline-none p-2 rounded-md hover:bg-slate-100">
+            <i data-lucide="menu" id="mobileMenuIcon" class="w-7 h-7"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="mobileMenu" class="hidden md:hidden absolute top-full left-0 right-0 bg-white shadow-xl py-2 z-40">
+        </div>
+    </nav>
+
+    <main class="pt-16"> <section id="home" class="bg-gradient-to-br from-sky-50 via-slate-50 to-sky-100 py-24 md:py-32 min-h-screen flex items-center relative overflow-hidden">
+            <div class="absolute inset-0 overflow-hidden z-0">
+                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <pattern id="heroPattern" patternUnits="userSpaceOnUse" width="100" height="100" class="text-sky-100/50 hero-bg-pattern">
+                      <path d="M50 0 L100 50 L50 100 L0 50 Z" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#heroPattern)">
+                    <animate attributeName="x" from="-100" to="0" dur="10s" repeatCount="indefinite" />
+                    <animate attributeName="y" from="-100" to="0" dur="12s" repeatCount="indefinite" />
+                  </rect>
+                   <circle cx="10%" cy="20%" r="150" class="hero-bg-circle-1">
+                     <animate attributeName="r" values="150;180;150" dur="8s" repeatCount="indefinite" />
+                   </circle>
+                   <circle cx="80%" cy="70%" r="200" class="hero-bg-circle-2">
+                     <animate attributeName="r" values="200;230;200" dur="10s" repeatCount="indefinite" />
+                   </circle>
+                </svg>
+            </div>
+            <div id="heroContent" class="container mx-auto px-6 text-center relative z-10">
+                </div>
+        </section>
+
+        <section id="about" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 text-slate-800">About Me</h2>
+                <div id="aboutContent" class="max-w-3xl mx-auto text-center mb-12">
+                    </div>
+                <div id="achievementsAndCerts" class="grid md:grid-cols-2 gap-10">
+                    </div>
+            </div>
+        </section>
+
+        <section id="experience" class="py-20 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 text-slate-800">Work Experience</h2>
+                <div id="experienceTimeline" class="relative max-w-4xl mx-auto">
+                    <div class="timeline-line"></div>
+                    </div>
+            </div>
+        </section>
+
+        <section id="education" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 text-slate-800">Education</h2>
+                <div id="educationList" class="max-w-3xl mx-auto grid md:grid-cols-1 gap-8">
+                    </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-20 bg-sky-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 text-slate-800">My Projects</h2>
+                <div id="projectGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    </div>
+            </div>
+        </section>
+
+        <section id="skills" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 text-slate-800">Technical Skills</h2>
+                <div id="skillsGrid" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-slate-200">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold text-center mb-16 text-white">Get In Touch</h2>
+                <p class="text-lg text-slate-300 max-w-xl mx-auto mb-12 leading-relaxed">
+                    I'm always open to discussing new projects, creative ideas, or opportunities to be part of something impactful. Feel free to reach out!
+                </p>
+                <div id="contactDetails" class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+                    </div>
+                <div id="contactSocialLinks" class="flex justify-center space-x-6">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer" class="bg-slate-900 text-slate-400 py-10 text-center">
+        </footer>
+
+    <script>
+        const userData = {
+          personal_information: {
+            name: "Ramit Dour",
+            titles: ["Software Developer", "IoT Developer", "Data Analyst", "Engineer"],
+            profile_summary: "Versatile full-stack developer with a strong foundation in data analytics and IoT. Proficient in Python, SQL, Java, and C++, with hands-on experience in building end-to-end data-driven and embedded solutions. Adept at transforming business needs into technical solutions across software, analytics, and hardware systems.",
+            email: "ramitdour.ie+github@gmail.com",
+            phone: "+353 XX XXX XXXX", 
+            github: "https://github.com/ramitdour",
+            linkedin: "https://www.linkedin.com/in/ramitdour/",
+            website: "https://ramitdour.com",
+            location: "Dublin, Ireland",
+            narrative_intro: "A technology enthusiast and problem-solver with a journey across diverse cities and roles. This experience has instilled a deep sense of adaptability and a passion for leveraging data and IoT to create impactful solutions. I thrive on continuous learning and applying new skills to real-world challenges.",
+            profileImagePlaceholder: "https://placehold.co/150x150/e0f2fe/38bdf8?text=RD"
+          },
+          experience_details: [
+            { position: "Sales Assistant", company: "Dealz (Poundland Ltd)", employment_period: "Feb 2024 - Present", location: "Dublin, Ireland", key_responsibilities: ["Delivered high customer satisfaction through product knowledge and service excellence.", "Managed inventory and in-store data to assist sales operations.", "Awarded Employee of the Month for outstanding performance and team support."], skills_acquired: ["Retail Data Handling", "Communication", "Customer Service", "Sales Optimization"] },
+            { position: "Project Associate", company: "Indian Institute of Technology Madras", employment_period: "Nov 2022 - Aug 2023", location: "Chennai, India", key_responsibilities: ["Led IoT team and collaborated with stakeholders to deliver dashboards enhancing decision-making by 30%.", "Conducted predictive modeling using Python/SQL, reducing production downtime by 20%.", "Implemented Indian government compliant data governance policies.", "Created real-time visualizations using Power BI, increasing insights adoption by 25%."], skills_acquired: ["IoT Architecture", "Predictive Analytics", "Data Governance", "SQL", "Power BI"] },
+            { position: "Co-Founder", company: "Suntronics Technologies", employment_period: "Dec 2019 - Nov 2022", location: "Indore, India", key_responsibilities: ["Built analytics dashboards and customer behavior models that improved retention by 15%.", "Developed financial forecasts using BI tools and SQL.", "Managed client demos and tech delivery for custom IoT solutions."], skills_acquired: ["IoT Product Development", "Financial Modeling", "BI Automation", "SQL", "Tableau"] },
+            { position: "System Engineer", company: "Infosys", employment_period: "June 2018 - Nov 2019", location: "Pune, India", key_responsibilities: ["Delivered data pipelines and automation scripts reducing reporting workload by 20 hours/month.", "Conducted customer insights analysis improving sales outcomes by 15%.", "Led root cause investigations saving $200K annually."], skills_acquired: ["ETL Development", "Python & SQL Automation", "Power BI", "Root Cause Analysis"] }
+          ],
+          education_details: [
+            { institution: "National College of Ireland", degree: "Master's Degree in Data Analytics", period: "Sep 2023 - Nov 2024 (Expected)", location: "Dublin, Ireland", final_evaluation_grade: "2.1 (Expected)", details: "Key Modules: Business Intelligence & Analytics, Predictive Analytics, Data Mining & Machine Learning, Statistics, Database Programming, Modelling & Optimization." },
+            { institution: "Rajiv Gandhi Proudyogiki Vishwavidyalaya", degree: "Bachelor of Engineering in Electrical Engineering", period: "Aug 2014 - June 2018", location: "Bhopal, India", final_evaluation_grade: "First Class Honours", details: "Focused on core electrical and electronics engineering principles with practical applications." }
+          ],
+          projects: [
+            { name: "Surface Defect Detection", description: "Image classification and SAM for detecting surface anomalies in industrial steel rolls.", link: "", imagePlaceholder: "https://placehold.co/600x400/0284c7/ffffff?text=Defect+Detection" },
+            { name: "Airbnb Sales Prediction", description: "Regression and forecasting to predict seasonal sales for Airbnb listings.", link: "", imagePlaceholder: "https://placehold.co/600x400/0ea5e9/ffffff?text=Airbnb+Analytics" },
+            { name: "Gas Price Forecasting", description: "Time series modeling with Facebook Prophet for Ireland gas prices.", link: "", imagePlaceholder: "https://placehold.co/600x400/38bdf8/ffffff?text=Gas+Price+AI" },
+            { name: "Wine Quality Prediction", description: "Classification using SVM and Random Forest for wine quality grading.", link: "", imagePlaceholder: "https://placehold.co/600x400/7dd3fc/0f172a?text=Wine+AI" },
+            { name: "ESP32 BLE HID Device", description: "Custom BLE HID combining media control and mouse gestures.", link: "https://github.com/ramitdour/ESP32-BLE-HID-Combo-Device-Media-Control-and-Mouse-Gesture", imagePlaceholder: "https://placehold.co/600x400/67e8f9/0f172a?text=ESP32+HID" },
+            { name: "IoT Table Clock Timer", description: "IoT-enabled table clock with timer, focusing on minimalist design.", link: "https://github.com/ramitdour/IoT-Table-Clock-Timer-ESP32-Pomodoro-Productivity", imagePlaceholder: "https://placehold.co/600x400/a5f3fc/0f172a?text=IoT+Clock" },
+          ],
+          skills_summary: { // Modified to use iconName
+            programming_languages: { iconName: "code", skills: ["Python", "R", "SQL", "Java", "C++", "JavaScript", "Bash", "Excel VBA"] },
+            visualization_tools: { iconName: "palette", skills: ["Power BI", "Tableau", "Matplotlib", "Seaborn", "Plotly", "DAX", "Power Query"] },
+            databases: { iconName: "server", skills: ["PostgreSQL", "MongoDB", "MySQL", "BigQuery", "Snowflake"] },
+            cloud_technologies: { iconName: "cloud", skills: ["AWS", "Azure", "Google Cloud Platform (GCP)"] },
+            iot_embedded: { iconName: "zap", skills: ["ESP32", "Raspberry Pi", "Firmware Development", "MQTT", "BLE", "Circuit Design"] },
+            other_tools: { iconName: "settings", skills: ["Git", "Docker", "NGINX", "Flask", "Jupyter Notebooks", "LaTeX", "Systemd", "Google AppScripts"] },
+            soft_skills: { iconName: "users", skills: ["Leadership", "Critical Thinking", "Data Storytelling", "Problem Solving", "Communication", "Adaptability", "Teamwork"] }
+          },
+           achievements: [ // Modified to use iconName
+            { name: "Employee of the Month", description: "Recognized at Dealz (Ireland) for outstanding customer service, teamwork, and performance.", iconName: "award" },
+            { name: "IIT Madras Innovation", description: "Led development of a cost-effective IoT air quality monitoring system, reducing hardware costs by 30%.", iconName: "lightbulb" }
+          ],
+          certifications: [ // Modified to use iconName
+            { name: "Planned: Power BI Data Analyst", description: "Targeting completion soon to formalize expertise in data visualization and modeling with Power BI.", iconName: "briefcase" },
+            { name: "Planned: AWS Cloud Practitioner", description: "Aiming to achieve this certification to validate foundational knowledge of AWS Cloud services.", iconName: "cloud" }
+          ],
+          resume_link: "#" // Replace with actual link
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const { personal_information: pi, experience_details: exp, education_details: edu, projects, skills_summary: skills, achievements, certifications, resume_link } = userData;
+
+            // --- Navbar Logic ---
+            const navLogo = document.getElementById('navLogo');
+            const nameParts = pi.name.split(' ');
+            navLogo.innerHTML = `${nameParts[0]}<span class="text-slate-700">${nameParts.length > 1 ? nameParts[1] : ''}</span>`;
+
+            const navLinks = ["Home", "About", "Experience", "Education", "Projects", "Skills", "Contact"];
+            const desktopNavContainer = document.getElementById('desktopNavLinks');
+            const mobileNavContainer = document.getElementById('mobileMenu');
+            
+            navLinks.forEach(linkText => {
+                const linkId = linkText.toLowerCase();
+                const aDesktop = document.createElement('a');
+                aDesktop.href = `#${linkId}`;
+                aDesktop.textContent = linkText;
+                aDesktop.className = "text-slate-600 hover:text-sky-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-sky-50 nav-link";
+                desktopNavContainer.appendChild(aDesktop);
+
+                const aMobile = document.createElement('a');
+                aMobile.href = `#${linkId}`;
+                aMobile.textContent = linkText;
+                aMobile.className = "block text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-6 py-3 text-base font-medium transition-colors nav-link";
+                mobileNavContainer.appendChild(aMobile);
+            });
+            
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenuIcon = document.getElementById('mobileMenuIcon');
+            const mobileMenu = document.getElementById('mobileMenu');
+            let isMobileMenuOpen = false;
+
+            mobileMenuButton.addEventListener('click', () => {
+                isMobileMenuOpen = !isMobileMenuOpen;
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuIcon.setAttribute('data-lucide', isMobileMenuOpen ? 'x' : 'menu');
+                lucide.createIcons(); // Re-render icon
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    // e.preventDefault(); // Optional: if you want to manage scroll entirely via JS
+                    if (isMobileMenuOpen) {
+                        isMobileMenuOpen = false;
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuIcon.setAttribute('data-lucide', 'menu');
+                        lucide.createIcons();
+                    }
+                    // Smooth scroll is handled by html { scroll-behavior: smooth; }
+                    // const targetId = link.getAttribute('href').substring(1);
+                    // document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // Navbar visibility on scroll
+            const navbar = document.getElementById('navbar');
+            let lastScrollY = window.scrollY;
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > lastScrollY && window.scrollY > 200) { // Scrolling down
+                    navbar.classList.remove('navbar-visible');
+                    navbar.classList.add('navbar-hidden');
+                } else { // Scrolling up or at the top
+                    navbar.classList.remove('navbar-hidden');
+                    navbar.classList.add('navbar-visible');
+                }
+                lastScrollY = window.scrollY;
+            }, { passive: true });
+
+
+            // --- Hero Section ---
+            const heroContent = document.getElementById('heroContent');
+            heroContent.innerHTML = `
+                <img src="${pi.profileImagePlaceholder}" alt="${pi.name}" class="w-36 h-36 md:w-48 md:h-48 rounded-full mx-auto mb-8 shadow-xl border-4 border-white" />
+                <h1 class="text-5xl md:text-7xl font-bold text-slate-800 mb-4">
+                  Hi, I'm <span class="text-sky-600">${pi.name.split(' ')[0]}</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-sky-700 font-semibold mb-6 tracking-wide">
+                  ${pi.titles.join(' • ')}
+                </p>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed">
+                  ${pi.profile_summary}
+                </p>
+                
+                <div class="max-w-md mx-auto my-10">
+                  <div id="threeSceneContainer" class="three-canvas-container"></div>
+                </div>
+
+                <div class="flex justify-center space-x-5 mb-10">
+                  <a href="${pi.github}" target="_blank" rel="noopener noreferrer" class="text-slate-700 hover:text-sky-600 p-3 bg-white/70 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="github" class="w-7 h-7"></i>
+                  </a>
+                  <a href="${pi.linkedin}" target="_blank" rel="noopener noreferrer" class="text-slate-700 hover:text-sky-600 p-3 bg-white/70 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="linkedin" class="w-7 h-7"></i>
+                  </a>
+                  <a href="mailto:${pi.email}" class="text-slate-700 hover:text-sky-600 p-3 bg-white/70 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="mail" class="w-7 h-7"></i>
+                  </a>
+                   <a href="${pi.website}" target="_blank" rel="noopener noreferrer" class="text-slate-700 hover:text-sky-600 p-3 bg-white/70 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="external-link" class="w-7 h-7"></i>
+                  </a>
+                </div>
+                ${resume_link && resume_link !== "#" ? `
+                <a 
+                    href="${resume_link}" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-sky-600 hover:bg-sky-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                    <i data-lucide="download" class="w-5 h-5 mr-2"></i>
+                    View My Resume
+                </a>` : ''}
+            `;
+            
+            // --- Three.js Scene ---
+            const threeSceneContainer = document.getElementById('threeSceneContainer');
+            if (threeSceneContainer && typeof THREE !== 'undefined') {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, threeSceneContainer.clientWidth / threeSceneContainer.clientHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                renderer.setSize(threeSceneContainer.clientWidth, threeSceneContainer.clientHeight);
+                renderer.setClearColor(0x000000, 0);
+                threeSceneContainer.appendChild(renderer.domElement);
+
+                const geometry = new THREE.BoxGeometry(2, 2, 2);
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                const context = canvas.getContext('2d');
+                const gradient = context.createLinearGradient(0, 0, 0, 64);
+                gradient.addColorStop(0, '#38bdf8'); // sky-500
+                gradient.addColorStop(1, '#0284c7'); // sky-600
+                context.fillStyle = gradient;
+                context.fillRect(0, 0, 64, 64);
+                const texture = new THREE.CanvasTexture(canvas);
+
+                const material = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.5, metalness: 0.1 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(5, 10, 7.5);
+                scene.add(directionalLight);
+
+                camera.position.z = 5;
+
+                const animate = function () {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.005;
+                    cube.rotation.y += 0.005;
+                    renderer.render(scene, camera);
+                };
+                animate();
+
+                const handleResize = () => {
+                    if (threeSceneContainer) {
+                        camera.aspect = threeSceneContainer.clientWidth / threeSceneContainer.clientHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(threeSceneContainer.clientWidth, threeSceneContainer.clientHeight);
+                    }
+                };
+                window.addEventListener('resize', handleResize);
+            }
+
+
+            // --- About Section ---
+            const aboutContent = document.getElementById('aboutContent');
+            aboutContent.innerHTML = `
+                <i data-lucide="user" class="w-14 h-14 mx-auto text-sky-500 mb-6"></i>
+                <p class="text-lg text-slate-700 leading-relaxed">${pi.narrative_intro}</p>
+            `;
+            const achievementsAndCertsContainer = document.getElementById('achievementsAndCerts');
+            achievementsAndCertsContainer.innerHTML = `
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-700 mb-6 flex items-center">
+                        <i data-lucide="award" class="w-8 h-8 mr-3 text-sky-500"></i>Achievements
+                    </h3>
+                    <div class="space-y-6">
+                        ${achievements.map(ach => `
+                            <div class="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 text-amber-500"><i data-lucide="${ach.iconName}" class="w-6 h-6"></i></div>
+                                    <div class="ml-4">
+                                        <h4 class="font-semibold text-lg text-slate-800">${ach.name}</h4>
+                                        <p class="text-sm text-slate-600">${ach.description}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-700 mb-6 flex items-center">
+                        <i data-lucide="target" class="w-8 h-8 mr-3 text-sky-500"></i>Certifications & Learning
+                    </h3>
+                     <div class="space-y-6">
+                        ${certifications.map(cert => `
+                            <div class="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0"><i data-lucide="${cert.iconName}" class="w-6 h-6 ${cert.iconName === 'cloud' ? 'text-orange-500' : 'text-blue-500'}"></i></div>
+                                    <div class="ml-4">
+                                        <h4 class="font-semibold text-lg text-slate-800">${cert.name}</h4>
+                                        <p class="text-sm text-slate-600">${cert.description}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // --- Experience Section ---
+            const experienceTimeline = document.getElementById('experienceTimeline');
+            exp.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `mb-12 md:mb-10 experience-item-container`;
+                
+                itemDiv.innerHTML = `
+                    <div class="timeline-icon-container">
+                        <i data-lucide="briefcase" class="w-4 h-4 md:w-5 md:h-5"></i>
+                    </div>
+                    <div class="md:flex experience-item-content-wrapper ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}">
+                        <div class="md:w-1/2"></div> <div class="md:w-1/2 ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}">
+                            <div class="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105 w-full cursor-pointer experience-card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-sky-700">${item.position}</h3>
+                                        <p class="text-md font-medium text-slate-600">${item.company}</p>
+                                    </div>
+                                    <button class="text-sky-500 hover:text-sky-700 transition-colors p-1">
+                                        <i data-lucide="chevron-down" class="w-6 h-6"></i>
+                                    </button>
+                                </div>
+                                <div class="flex flex-wrap items-center text-sm text-slate-500 mb-3 gap-x-3 gap-y-1">
+                                    <span class="flex items-center"><i data-lucide="calendar-days" class="w-4 h-4 mr-1.5"></i> ${item.employment_period}</span>
+                                    <span class="hidden sm:inline">|</span>
+                                    <span class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-1.5"></i> ${item.location}</span>
+                                </div>
+                                <div class="experience-details mt-4 pt-4 border-t border-slate-200 hidden">
+                                    <h4 class="font-semibold text-slate-700 mb-1">Key Responsibilities:</h4>
+                                    <ul class="list-disc list-inside text-slate-600 space-y-1.5 mb-4 text-sm">
+                                        ${item.key_responsibilities.map(resp => `<li>${resp}</li>`).join('')}
+                                    </ul>
+                                    <h4 class="font-semibold text-slate-700 mb-2">Skills Acquired:</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${item.skills_acquired.map(skill => `<span class="bg-sky-100 text-sky-700 px-3 py-1 text-xs font-semibold rounded-full shadow-sm">${skill}</span>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                experienceTimeline.appendChild(itemDiv);
+            });
+
+            document.querySelectorAll('.experience-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const details = card.querySelector('.experience-details');
+                    const icon = card.querySelector('button i');
+                    const isOpen = details.classList.toggle('hidden');
+                    icon.setAttribute('data-lucide', isOpen ? 'chevron-down' : 'chevron-up');
+                    lucide.createIcons();
+                });
+            });
+
+            // --- Education Section ---
+            const educationList = document.getElementById('educationList');
+            edu.forEach(item => {
+                educationList.innerHTML += `
+                    <div class="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105">
+                        <div class="flex items-start">
+                            <div class="p-3 bg-sky-100 rounded-full mr-5 mt-1">
+                                <i data-lucide="graduation-cap" class="w-7 h-7 text-sky-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-sky-700">${item.degree}</h3>
+                                <p class="text-md font-medium text-slate-600">${item.institution}</p>
+                                <div class="text-sm text-slate-500 my-2 space-y-1">
+                                    <span class="flex items-center"><i data-lucide="calendar-days" class="w-4 h-4 mr-2 text-slate-400"></i> ${item.period}</span>
+                                    <span class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-slate-400"></i> ${item.location}</span>
+                                    ${item.final_evaluation_grade ? `<span class="flex items-center"><i data-lucide="star" class="w-4 h-4 mr-2 text-amber-400"></i> ${item.final_evaluation_grade}</span>` : ''}
+                                </div>
+                                <p class="text-sm text-slate-600 mt-3 leading-relaxed">${item.details}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // --- Projects Section ---
+            const projectGrid = document.getElementById('projectGrid');
+            projects.forEach(item => {
+                projectGrid.innerHTML += `
+                    <div class="bg-white shadow-lg rounded-xl p-0 transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105 flex flex-col group overflow-hidden">
+                        <div class="relative h-48 w-full mb-0 rounded-t-lg overflow-hidden">
+                            <img 
+                                src="${item.imagePlaceholder}" 
+                                alt="${item.name}" 
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x400/cbd5e1/475569?text=Image+Error';"
+                            />
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-lg font-semibold text-sky-700 mb-2">${item.name}</h3>
+                            <p class="text-sm text-slate-600 flex-grow mb-4 leading-relaxed">${item.description}</p>
+                            ${item.link ? `
+                            <a
+                                href="${item.link}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex items-center text-sm text-sky-600 hover:text-sky-800 font-semibold self-start mt-auto group"
+                            >
+                                View Project <i data-lucide="external-link" class="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform duration-200"></i>
+                            </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // --- Skills Section ---
+            const skillsGrid = document.getElementById('skillsGrid');
+            Object.entries(skills).forEach(([categoryKey, categoryData]) => {
+                const title = categoryKey.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                skillsGrid.innerHTML += `
+                    <div class="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 ease-in-out hover:shadow-2xl hover:scale-105 mb-8 w-full">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-5 flex items-center">
+                            <i data-lucide="${categoryData.iconName}" class="w-7 h-7 mr-3 text-sky-500"></i> ${title} 
+                        </h3>
+                        <div class="flex flex-wrap gap-3">
+                            ${categoryData.skills.map(skill => `
+                                <span class="bg-gradient-to-r from-sky-100 to-sky-200 text-sky-800 px-4 py-2 text-sm font-medium rounded-full shadow-sm hover:shadow-md transition-shadow duration-200">
+                                    ${skill}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // --- Contact Section ---
+            const contactDetails = document.getElementById('contactDetails');
+            contactDetails.innerHTML = `
+                <div class="flex flex-col items-center p-6 bg-slate-700/70 rounded-xl shadow-lg hover:bg-slate-600/70 transition-colors duration-300">
+                    <i data-lucide="mail" class="w-9 h-9 text-sky-400 mb-4"></i>
+                    <h4 class="text-xl font-semibold mb-1 text-white">Email</h4>
+                    <a href="mailto:${pi.email}" class="text-sky-300 hover:text-sky-200 transition-colors break-all">${pi.email}</a>
+                </div>
+                <div class="flex flex-col items-center p-6 bg-slate-700/70 rounded-xl shadow-lg hover:bg-slate-600/70 transition-colors duration-300">
+                    <i data-lucide="phone" class="w-9 h-9 text-sky-400 mb-4"></i>
+                    <h4 class="text-xl font-semibold mb-1 text-white">Phone</h4>
+                    <a href="tel:${pi.phone.replace(/\s/g, '')}" class="text-sky-300 hover:text-sky-200 transition-colors">${pi.phone}</a>
+                </div>
+                <div class="flex flex-col items-center p-6 bg-slate-700/70 rounded-xl shadow-lg hover:bg-slate-600/70 transition-colors duration-300">
+                    <i data-lucide="map-pin" class="w-9 h-9 text-sky-400 mb-4"></i>
+                    <h4 class="text-xl font-semibold mb-1 text-white">Location</h4>
+                    <p class="text-slate-300">${pi.location}</p>
+                </div>
+            `;
+            const contactSocialLinks = document.getElementById('contactSocialLinks');
+            contactSocialLinks.innerHTML = `
+                <a href="${pi.github}" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-sky-300 p-3 bg-slate-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="github" class="w-7 h-7"></i>
+                </a>
+                <a href="${pi.linkedin}" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-sky-300 p-3 bg-slate-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="linkedin" class="w-7 h-7"></i>
+                </a>
+                <a href="${pi.website}" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-sky-300 p-3 bg-slate-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="external-link" class="w-7 h-7"></i>
+                </a>
+            `;
+
+            // --- Footer ---
+            const footer = document.getElementById('footer');
+            footer.innerHTML = `
+                <p class="text-sm">&copy; ${new Date().getFullYear()} ${pi.name}. All rights reserved.</p>
+                <p class="text-xs mt-2">Built with HTML, Tailwind CSS & Three.js. Icons by Lucide.</p>
+            `;
+
+            // Initialize Lucide Icons
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
