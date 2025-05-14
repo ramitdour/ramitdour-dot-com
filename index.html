@@ -128,7 +128,27 @@
         }
         .font-inter { font-family: 'Inter', sans-serif; } /* Assuming Inter is a desired font, load it if needed */
 
+        
+
     </style>
+    <style>
+        .libutton {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 7px;
+          text-align: center;
+          outline: none;
+          text-decoration: none !important;
+          color: #ffffff !important;
+          width: 200px;
+          height: 32px;
+          border-radius: 16px;
+          background-color: #0A66C2;
+          font-family: "SF Pro Text", Helvetica, sans-serif;
+        }
+      </style>
+    
      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="font-inter antialiased text-slate-800 bg-slate-50 selection:bg-sky-300 selection:text-sky-900">
@@ -661,6 +681,10 @@
                 <a href="${pi.website}" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-sky-300 p-3 bg-slate-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
                     <i data-lucide="external-link" class="w-7 h-7"></i>
                 </a>
+                
+      
+<a class="libutton" href="https://www.linkedin.com/comm/mynetwork/discovery-see-all?usecase=PEOPLE_FOLLOWS&followMember=ramitdour" target="_blank">Follow on LinkedIn</a>
+
             `;
 
             // --- Footer ---
